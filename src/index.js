@@ -1,20 +1,25 @@
-export default function search(docs, word) {
-  const normalizedWord = word.toLowerCase().replace(/[^\w\s]/g, '')
-  let result = docs.reduce((acc, doc) => {
+export default function search(docs, query) {
+  const term = query
+    .toLowerCase()
+    .replace(/[^\w\s]/g, '')
+    .trim()
+
+  const selectedDocs = docs.reduce((acc, doc) => {
     if (!doc.text) return acc
-    const normalizedDocText = normalizeText(doc.text)
-    if (normalizedDocText.includes(normalizedWord)) {
-      acc.push(doc.id)
+
+    const termAmount = doc.text
+      .toLowerCase()
+      .replace(/[^\w\s]/g, '')
+      .split(/\s+/)
+      .filter(word => word === term).length
+
+    if (termAmount > 0) {
+      acc.push({ id: doc.id, entries: termAmount })
     }
     return acc
   }, [])
 
-  return result
-}
-
-function normalizeText(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s]/g, '')
-    .split(' ')
+  return selectedDocs
+    .sort((a, b) => b.entries - a.entries)
+    .map(doc => doc.id)
 }

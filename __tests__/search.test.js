@@ -14,7 +14,7 @@ test('search by a word appearing in multiple documents', () => {
   const docs = [doc1, doc2, doc3]
 
   const result = search(docs, 'shoot')
-  expect(result).toEqual(['doc1', 'doc2'])
+  expect(result).toEqual(['doc2', 'doc1'])
 })
 
 test('search by a word appearing in single document', () => {
