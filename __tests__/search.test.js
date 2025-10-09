@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import search from '../index.js'
+import search from '../src/index.js'
 
 test('search by a word appearing in multiple documents', () => {
   const doc1 = {
