@@ -9,19 +9,29 @@ export default function getInvertedIndex(docs) {
       .replace(/[^\w\s]/g, '')
       .split(/\s+/)
 
-    const seenWords = new Set()
-
+    const termFrequencies = {}
     for (let word of text) {
-      if (seenWords.has(word)) continue
+      termFrequencies[word] = (termFrequencies[word] || 0) + 1
+    }
 
-      seenWords.add(word)
-
+    for (let word in termFrequencies) {
       if (!invertedIndex[word]) {
-        invertedIndex[word] = []
+        invertedIndex[word] = {
+          idf: 0,
+          documents: [],
+        }
       }
 
-      invertedIndex[word].push(doc.id)
+      invertedIndex[word].documents.push({
+        id: doc.id,
+        termFrequency: termFrequencies[word],
+      })
     }
+  }
+
+  for (let word in invertedIndex) {
+    const docCount = invertedIndex[word].documents.length
+    invertedIndex[word].idf = Number(Math.log2(1 + (docs.length - docCount + 1) / (docCount + 0.5)).toFixed(3))
   }
 
   return invertedIndex
