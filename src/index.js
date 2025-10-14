@@ -22,14 +22,7 @@ export default function search(docs, query) {
     }
   }
 
-  const docIndexMap = new Map(docs.map((doc, index) => [doc.id, index]))
-
   return Object.entries(selectedDocsScores)
-    .sort(([docIdA, scoreA], [docIdB, scoreB]) => {
-      const scoreDiff = scoreB - scoreA
-      return scoreDiff !== 0
-        ? scoreDiff
-        : docIndexMap.get(docIdA) - docIndexMap.get(docIdB)
-    })
+    .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
     .map(([docId]) => docId)
 }

@@ -24,7 +24,7 @@ export default function getInvertedIndex(docs) {
 
       invertedIndex[word].documents.push({
         id: doc.id,
-        termFrequency: termFrequencies[word],
+        termFrequency: termFrequencies[word] / text.length,
         tfIdf: 0,
       })
     }
