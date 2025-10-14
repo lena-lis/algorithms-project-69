@@ -12,9 +12,9 @@ export default function search(docs, query) {
   const selectedDocsScores = {}
 
   for (let word of term) {
-    if (!invertedIndex[word]) continue
-
     const wordData = invertedIndex[word]
+
+    if (!wordData) continue
 
     for (let doc of wordData.documents) {
       selectedDocsScores[doc.id]
@@ -22,7 +22,14 @@ export default function search(docs, query) {
     }
   }
 
+  const docIndexMap = new Map(docs.map((doc, index) => [doc.id, index]))
+
   return Object.entries(selectedDocsScores)
-    .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
+    .sort(([docIdA, scoreA], [docIdB, scoreB]) => {
+      const scoreDiff = scoreB - scoreA
+      return scoreDiff !== 0
+        ? scoreDiff
+        : docIndexMap.get(docIdA) - docIndexMap.get(docIdB)
+    })
     .map(([docId]) => docId)
 }
