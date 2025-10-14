@@ -11,7 +11,7 @@ export default function getInvertedIndex(docs) {
 
     const termFrequencies = {};
 
-    text.forEach(word => termFrequencies[word] = (termFrequencies[word] || 0) + 1);
+    text.forEach((word) => termFrequencies[word] = (termFrequencies[word] || 0) + 1);
 
     for (let word in termFrequencies) {
       if (Object.hasOwn(termFrequencies, word)) {
@@ -39,7 +39,7 @@ export default function getInvertedIndex(docs) {
         Math.log2(1 + (docs.length - docCount + 1) / (docCount + 0.5)).toFixed(3),
       );
 
-      documents.forEach(doc => doc.tfIdf = doc.termFrequency * invertedIndex[word].idf);
+      documents.forEach((doc) => doc.tfIdf = doc.termFrequency * invertedIndex[word].idf);
     }
   }
 
