@@ -11,11 +11,12 @@ export default function getInvertedIndex(docs) {
 
     const termFrequencies = {};
 
-    text.forEach((word) => termFrequencies[word] = (termFrequencies[word] || 0) + 1);
+    text.forEach((word) => {
+      termFrequencies[word] = (termFrequencies[word] || 0) + 1
+    });
 
-    for (let word in termFrequencies) {
-      if (Object.hasOwn(termFrequencies, word)) {
-        if (!invertedIndex[word]) {
+    Object.keys(termFrequencies).forEach((word) => {
+      if (!invertedIndex[word]) {
           invertedIndex[word] = {
             idf: 0,
             documents: [],
@@ -27,21 +28,20 @@ export default function getInvertedIndex(docs) {
           termFrequency: termFrequencies[word] / text.length,
           tfIdf: 0,
         });
-      }
-    }
+    });
   });
 
-  for (const word in invertedIndex) {
-    if (Object.hasOwn(invertedIndex, word)) {
-      const documents = invertedIndex[word].documents;
-      const docCount = documents.length;
-      invertedIndex[word].idf = Number(
-        Math.log2(1 + (docs.length - docCount + 1) / (docCount + 0.5)).toFixed(3),
-      );
+  Object.keys(invertedIndex).forEach((word) => {
+    const {documents} = invertedIndex[word];
+    const docCount = documents.length;
+    invertedIndex[word].idf = Number(
+      Math.log2(1 + (docs.length - docCount + 1) / (docCount + 0.5)).toFixed(3),
+    );
 
-      documents.forEach((doc) => doc.tfIdf = doc.termFrequency * invertedIndex[word].idf);
+    for (let i = 0; i < documents.length; i++) {
+      documents[i].tfIdf = documents[i].termFrequency * invertedIndex[word].idf
     }
-  }
+  });
 
   return invertedIndex;
 }
