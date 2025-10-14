@@ -25,13 +25,20 @@ export default function getInvertedIndex(docs) {
       invertedIndex[word].documents.push({
         id: doc.id,
         termFrequency: termFrequencies[word],
+        tfIdf: 0,
       })
     }
   }
 
   for (let word in invertedIndex) {
     const docCount = invertedIndex[word].documents.length
-    invertedIndex[word].idf = Number(Math.log2(1 + (docs.length - docCount + 1) / (docCount + 0.5)).toFixed(3))
+    invertedIndex[word].idf = Number(
+      Math.log2(1 + (docs.length - docCount + 1) / (docCount + 0.5)).toFixed(3),
+    )
+
+    for (let doc of invertedIndex[word].documents) {
+      doc.tfIdf = doc.termFrequency * invertedIndex[word].idf
+    }
   }
 
   return invertedIndex
