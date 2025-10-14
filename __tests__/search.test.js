@@ -1,5 +1,20 @@
+import path from 'path'
+import { promises as fs } from 'fs'
+import { fileURLToPath } from 'url'
 import { expect, test } from '@jest/globals'
 import search from '../src/index.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+const getFixturePath = name =>
+  path.join(__dirname, '..', '__fixtures__', name)
+
+const getDocumentText = async (id) => {
+  const documentPath = getFixturePath(id)
+  const text = await fs.readFile(documentPath, 'utf8')
+  return { id, text }
+}
 
 test('search by multiple words appearing in multiple documents', () => {
   const doc1 = {
@@ -109,4 +124,19 @@ test('ignore punctuation', () => {
 
   const result = search(docs, 'pint!')
   expect(result).toEqual(['doc1'])
+})
+
+test('search with spam, pretext', async () => {
+  const searchText = 'the trash island is a'
+  const docIds = [
+    'garbage_patch_NG',
+    'garbage_patch_ocean_clean',
+    'garbage_patch_wiki',
+    'garbage_patch_spam',
+  ]
+
+  const documentsPaths = await Promise.all(docIds.map(getDocumentText))
+  const result = await search(documentsPaths, searchText)
+
+  expect(result).toEqual(docIds)
 })
