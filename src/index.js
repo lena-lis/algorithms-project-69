@@ -1,46 +1,28 @@
+import getInvertedIndex from './get-inverted-index.js'
+
 export default function search(docs, query) {
+  const invertedIndex = getInvertedIndex(docs)
+
   const term = query
     .toLowerCase()
     .replace(/[^\w\s]/g, '')
     .trim()
     .split(/\s+/)
 
-  const selectedDocs = docs.reduce((acc, doc) => {
-    if (!doc.text) return acc
+  const selectedDocsScores = {}
 
-    let uniqueWordsDictionary = {}
-    let termAmount = 0
+  for (let word of term) {
+    if (!invertedIndex[word]) continue
 
-    const textArray = doc.text
-      .toLowerCase()
-      .replace(/[^\w\s]/g, '')
-      .split(/\s+/)
+    const wordData = invertedIndex[word]
 
-    textArray.forEach((word) => {
-      if (term.includes(word)) {
-        if (!Object.hasOwn(uniqueWordsDictionary, word)) {
-          uniqueWordsDictionary[word] = 1
-        }
-
-        termAmount++
-      }
-    })
-
-    const uniqueWordsAmount = Object.keys(uniqueWordsDictionary).length
-
-    if (uniqueWordsAmount > 0) {
-      acc.push({ id: doc.id, uniqueWords: uniqueWordsAmount, entries: termAmount })
+    for (let doc of wordData.documents) {
+      selectedDocsScores[doc.id]
+        = (selectedDocsScores[doc.id] || 0) + doc.tfIdf
     }
-    return acc
-  }, [])
+  }
 
-  return selectedDocs
-    .sort((a, b) => {
-      if (b.uniqueWords !== a.uniqueWords) {
-        return b.uniqueWords - a.uniqueWords
-      }
-
-      return b.entries - a.entries
-    })
-    .map(doc => doc.id)
+  return Object.entries(selectedDocsScores)
+    .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
+    .map(([docId]) => docId)
 }
