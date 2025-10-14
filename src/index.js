@@ -17,7 +17,7 @@ export default function search(docs, query) {
     if (!wordData) return;
 
     wordData.documents.forEach((doc) => {
-      selectedDocsScores[doc.id] = (selectedDocsScores[doc.id] || 0) + doc.tfIdf
+      selectedDocsScores[doc.id] = (selectedDocsScores[doc.id] || 0) + doc.tfIdf;
     });
   });
 
